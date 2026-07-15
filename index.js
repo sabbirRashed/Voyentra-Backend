@@ -11,6 +11,7 @@ const port = process.env.PORT || 5000;
 
 // middle ware
 app.use(cors());
+app.use(express.json())
 
 
 const client = new MongoClient(uri, {
@@ -25,6 +26,17 @@ const run = async () => {
     try {
         // Connect the client to the server	
         await client.connect();
+        
+        const db = client.db('VoyentraDB');
+        const destinationCollection = db.collection('destinations');
+
+        app.post('/destination', async(req, res)=>{
+            const destinationDoc = req.body;
+            const result = await destinationCollection.insertOne(destinationDoc);
+
+            res.send(result);
+
+        })
 
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
