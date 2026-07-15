@@ -30,10 +30,16 @@ const run = async () => {
         const db = client.db('VoyentraDB');
         const destinationCollection = db.collection('destinations');
 
+        app.get('/destinations', async(req, res)=>{
+            const result = await destinationCollection.find().toArray();
+            res.send(result);
+        })
+
         app.post('/destination', async(req, res)=>{
             const destinationDoc = req.body;
+            console.log(destinationDoc);
             const result = await destinationCollection.insertOne(destinationDoc);
-
+            
             res.send(result);
 
         })
@@ -44,7 +50,7 @@ const run = async () => {
     } 
     finally {
         // Ensures that the client will close when you finish/error
-        await client.close();
+        // await client.close();
     }
 }
 
