@@ -33,7 +33,7 @@ const run = async () => {
         app.get('/destinations', async (req, res) => {
             const result = await destinationCollection.find().toArray();
             res.send(result);
-        })
+        });
 
         app.get('/destinations/:id', async (req, res) => {
             const id = req.params.id;
@@ -42,13 +42,30 @@ const run = async () => {
             }
             const result = await destinationCollection.findOne(query);
             res.send(result);
-        })
+        });
 
         app.post('/destination', async (req, res) => {
             const destinationDoc = req.body;
             console.log(destinationDoc);
             const result = await destinationCollection.insertOne(destinationDoc);
 
+            res.send(result);
+
+        });
+
+        app.patch('/destination/:id', async (req, res) => {
+            const id = req.params.id;
+            const modifiedDestination = req.body;
+
+            const filter = {
+                _id = new ObjectId(id),
+            };
+
+            const updateDocument = {
+                $set: modifiedDestination,
+            }
+
+            const result = await destinationCollection.fintOne(filter, updateDocument);
             res.send(result);
 
         })
