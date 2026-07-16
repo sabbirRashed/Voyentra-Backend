@@ -46,9 +46,8 @@ const run = async () => {
 
         app.post('/destination', async (req, res) => {
             const destinationDoc = req.body;
-            console.log(destinationDoc);
-            const result = await destinationCollection.insertOne(destinationDoc);
 
+            const result = await destinationCollection.insertOne(destinationDoc);
             res.send(result);
 
         });
@@ -58,16 +57,23 @@ const run = async () => {
             const modifiedDestination = req.body;
 
             const filter = {
-                _id = new ObjectId(id),
+                _id : new ObjectId(id),
             };
 
             const updateDocument = {
                 $set: modifiedDestination,
             }
 
-            const result = await destinationCollection.fintOne(filter, updateDocument);
+            const result = await destinationCollection.updateOne(filter, updateDocument);
             res.send(result);
 
+        })
+
+        app.delete('/destination/:id', async(req,res)=>{
+            const id = req.params.id;
+            const result = await destinationCollection.deleteOne({_id: new ObjectId(id)})
+            console.log('after delete:', result);
+            res.send(result);
         })
 
         // Send a ping to confirm a successful connection
