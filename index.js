@@ -59,7 +59,7 @@ const run = async () => {
             const modifiedDestination = req.body;
 
             const filter = {
-                _id : new ObjectId(id),
+                _id: new ObjectId(id),
             };
 
             const updateDocument = {
@@ -71,19 +71,35 @@ const run = async () => {
 
         })
 
-        app.delete('/destination/:id', async(req,res)=>{
+        app.delete('/destination/:id', async (req, res) => {
             const id = req.params.id;
-            const result = await destinationCollection.deleteOne({_id: new ObjectId(id)})
+            const result = await destinationCollection.deleteOne({ _id: new ObjectId(id) })
             console.log('after delete:', result);
             res.send(result);
         })
 
         // Bookings API
-        app.post('/booking', async(req, res)=>{
+        app.get('/booking/:userId', async(req, res) => {
+            const userId = req.params.userId;
+            const result = await bookingsCollection.find({userId}).toArray();
+            res.send(result);
+        })
+
+        app.post('/booking', async (req, res) => {
             const bookingData = req.body;
             const result = await bookingsCollection.insertOne(bookingData);
             res.send(result);
         })
+
+        app.delete('/booking/:bookingId', async(req, res)=>{
+            const bookingId = req.params.bookingId;
+            const filter = {
+                _id: new ObjectId(bookingId)
+            }
+            const result = await bookingsCollection.deleteOne(filter);
+            res.send(result);
+        })
+
 
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
