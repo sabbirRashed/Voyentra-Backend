@@ -27,8 +27,10 @@ const run = async () => {
         // Connect the client to the server	
         await client.connect();
 
+        // Destinations API
         const db = client.db('VoyentraDB');
         const destinationCollection = db.collection('destinations');
+        const bookingsCollection = db.collection('bookings');
 
         app.get('/destinations', async (req, res) => {
             const result = await destinationCollection.find().toArray();
@@ -73,6 +75,13 @@ const run = async () => {
             const id = req.params.id;
             const result = await destinationCollection.deleteOne({_id: new ObjectId(id)})
             console.log('after delete:', result);
+            res.send(result);
+        })
+
+        // Bookings API
+        app.post('/booking', async(req, res)=>{
+            const bookingData = req.body;
+            const result = await bookingsCollection.insertOne(bookingData);
             res.send(result);
         })
 
