@@ -40,12 +40,12 @@ const verifyToken = async (req, res, next) => {
     }
 
     try {
-        const {payload}= await jwtVerify(token, JWKS)
-        console.log('payload:',payload);
+        const { payload } = await jwtVerify(token, JWKS)
+        console.log('payload:', payload);
         next()
     }
     catch (error) {
-        res.status(403).send({message: "Forbidden"})
+        res.status(403).send({ message: "Forbidden" })
     }
 }
 
@@ -106,19 +106,19 @@ const run = async () => {
         })
 
         // Bookings API
-        app.get('/booking/:userId', async (req, res) => {
+        app.get('/booking/:userId', verifyToken, async (req, res) => {
             const userId = req.params.userId;
             const result = await bookingsCollection.find({ userId }).toArray();
             res.send(result);
         })
 
-        app.post('/booking', async (req, res) => {
+        app.post('/booking', verifyToken, async (req, res) => {
             const bookingData = req.body;
             const result = await bookingsCollection.insertOne(bookingData);
             res.send(result);
         })
 
-        app.delete('/booking/:bookingId', async (req, res) => {
+        app.delete('/booking/:bookingId', verifyToken, async (req, res) => {
             const bookingId = req.params.bookingId;
             const filter = {
                 _id: new ObjectId(bookingId)
