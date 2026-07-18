@@ -73,7 +73,7 @@ const run = async () => {
             res.send(result);
         });
 
-        app.post('/destination', async (req, res) => {
+        app.post('/destination',  verifyToken, async(req, res) => {
             const destinationDoc = req.body;
 
             const result = await destinationCollection.insertOne(destinationDoc);
@@ -81,7 +81,7 @@ const run = async () => {
 
         });
 
-        app.patch('/destination/:id', async (req, res) => {
+        app.patch('/destination/:id',  verifyToken, async(req, res) => {
             const id = req.params.id;
             const modifiedDestination = req.body;
 
@@ -98,7 +98,7 @@ const run = async () => {
 
         })
 
-        app.delete('/destination/:id', async (req, res) => {
+        app.delete('/destination/:id', verifyToken, async(req, res) => {
             const id = req.params.id;
             const result = await destinationCollection.deleteOne({ _id: new ObjectId(id) })
             console.log('after delete:', result);
