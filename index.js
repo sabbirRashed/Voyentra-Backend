@@ -26,7 +26,7 @@ const client = new MongoClient(uri, {
 
 // middle ware JWT
 const JWKS = createRemoteJWKSet(
-    new URL('http://localhost:3000/api/auth/jwks')
+    new URL(`${process.env.CLIENT_URL}/api/auth/jwks`)
 );
 
 const verifyToken = async (req, res, next) => {
@@ -41,7 +41,6 @@ const verifyToken = async (req, res, next) => {
 
     try {
         const { payload } = await jwtVerify(token, JWKS)
-        console.log('payload:', payload);
         next()
     }
     catch (error) {
@@ -52,7 +51,7 @@ const verifyToken = async (req, res, next) => {
 const run = async () => {
     try {
         // Connect the client to the server	
-        await client.connect();
+        // await client.connect();
 
         // Destinations API
         const db = client.db('VoyentraDB');
@@ -101,7 +100,6 @@ const run = async () => {
         app.delete('/destination/:id', verifyToken, async(req, res) => {
             const id = req.params.id;
             const result = await destinationCollection.deleteOne({ _id: new ObjectId(id) })
-            console.log('after delete:', result);
             res.send(result);
         })
 
@@ -129,7 +127,7 @@ const run = async () => {
 
 
         // Send a ping to confirm a successful connection
-        await client.db("admin").command({ ping: 1 });
+        // await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     }
     finally {
