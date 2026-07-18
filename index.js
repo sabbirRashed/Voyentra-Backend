@@ -37,7 +37,16 @@ const run = async () => {
             res.send(result);
         });
 
-        app.get('/destinations/:id', async (req, res) => {
+        app.get('/destinations/:id', async (req, res, next) => {
+            const secretKey = req.headers.authorization;
+            console.log('secret:', secretKey);
+
+            if (secretKey !== 'loged in') {
+                res.status(401).send({message: 'you are not authorized'})
+            }
+            next()
+
+        }, async (req, res) => {
             const id = req.params.id;
             const query = {
                 _id: new ObjectId(id)
@@ -79,9 +88,9 @@ const run = async () => {
         })
 
         // Bookings API
-        app.get('/booking/:userId', async(req, res) => {
+        app.get('/booking/:userId', async (req, res) => {
             const userId = req.params.userId;
-            const result = await bookingsCollection.find({userId}).toArray();
+            const result = await bookingsCollection.find({ userId }).toArray();
             res.send(result);
         })
 
@@ -91,7 +100,7 @@ const run = async () => {
             res.send(result);
         })
 
-        app.delete('/booking/:bookingId', async(req, res)=>{
+        app.delete('/booking/:bookingId', async (req, res) => {
             const bookingId = req.params.bookingId;
             const filter = {
                 _id: new ObjectId(bookingId)
