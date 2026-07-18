@@ -38,12 +38,10 @@ const run = async () => {
         });
 
         app.get('/destinations/:id', async (req, res, next) => {
-            const secretKey = req.headers.authorization;
-            console.log('secret:', secretKey);
+            const token = req.headers.authorization;
+            console.log('secret:', token);
 
-            if (secretKey !== 'loged in') {
-                res.status(401).send({message: 'you are not authorized'})
-            }
+            
             next()
 
         }, async (req, res) => {
