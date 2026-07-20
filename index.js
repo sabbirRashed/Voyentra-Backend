@@ -11,7 +11,14 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 // middle ware
-app.use(cors());
+app.use(cors({
+    origin: [
+        "http://localhost:3000",
+        "https://voyentra.vercel.app",
+    ],
+    methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+}));
 app.use(express.json())
 
 
@@ -32,11 +39,11 @@ const JWKS = createRemoteJWKSet(
 const verifyToken = async (req, res, next) => {
     const authHeader = req?.headers?.authorization;
     if (!authHeader) {
-        res.status(401).send({ message: 'You are not authorized' });
+        return res.status(401).send({ message: 'Unauthorized' });
     }
     const token = authHeader.split(" ")[1]
     if (!token) {
-        res.status(401).send({ message: 'You are not authorized' })
+        return res.status(401).send({ message: 'Unauthorized' })
     }
 
     try {
@@ -44,7 +51,7 @@ const verifyToken = async (req, res, next) => {
         next()
     }
     catch (error) {
-        res.status(403).send({ message: "Forbidden" })
+        return res.status(403).send({ message: "Forbidden" })
     }
 }
 
@@ -58,12 +65,17 @@ const run = async () => {
         const destinationCollection = db.collection('destinations');
         const bookingsCollection = db.collection('bookings');
 
+        app.get('/featured', async(req, res) =>{
+            const result = await destinationCollection.find().limit(4).toArray();
+            res.send(result);
+        })
+
         app.get('/destinations', async (req, res) => {
             const result = await destinationCollection.find().toArray();
             res.send(result);
         });
 
-        app.get('/destinations/:id', verifyToken, async (req, res) => {
+        app.get('/destinations/:id', verifyToken,  async (req, res) => {
             const id = req.params.id;
             const query = {
                 _id: new ObjectId(id)
@@ -72,7 +84,7 @@ const run = async () => {
             res.send(result);
         });
 
-        app.post('/destination',  verifyToken, async(req, res) => {
+        app.post('/destination', verifyToken, async (req, res) => {
             const destinationDoc = req.body;
 
             const result = await destinationCollection.insertOne(destinationDoc);
@@ -80,7 +92,7 @@ const run = async () => {
 
         });
 
-        app.patch('/destination/:id',  verifyToken, async(req, res) => {
+        app.patch('/destination/:id', verifyToken, async (req, res) => {
             const id = req.params.id;
             const modifiedDestination = req.body;
 
@@ -97,7 +109,7 @@ const run = async () => {
 
         })
 
-        app.delete('/destination/:id', verifyToken, async(req, res) => {
+        app.delete('/destination/:id', verifyToken, async (req, res) => {
             const id = req.params.id;
             const result = await destinationCollection.deleteOne({ _id: new ObjectId(id) })
             res.send(result);
